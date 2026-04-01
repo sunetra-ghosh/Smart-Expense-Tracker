@@ -1,0 +1,306 @@
+const mongoose = require('mongoose');
+const auditPlugin = require('../plugins/mongooseAuditV2');
+
+const transactionSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    kind: {
+        type: String,
+        required: true,
+        enum: ['expense', 'income', 'transfer'],
+        default: 'expense'
+    },
+    description: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 100
+    },
+    amount: {
+        type: Number,
+        required: true,
+        min: 0.01
+    },
+    originalAmount: {
+        type: Number,
+        required: true,
+        min: 0.01
+    },
+    originalCurrency: {
+        type: String,
+        required: true,
+        default: 'INR',
+        uppercase: true
+    },
+    convertedAmount: {
+        type: Number,
+        min: 0.01
+    },
+    convertedCurrency: {
+        type: String,
+        uppercase: true
+    },
+    exchangeRate: {
+        type: Number,
+        min: 0
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Taxonomy',
+        required: true,
+        index: true
+    },
+    type: {
+        type: String,
+        required: true,
+        enum: ['income', 'expense', 'transfer']
+    },
+    merchant: {
+        type: String,
+        trim: true,
+        maxlength: 50,
+        default: '',
+        sensitive: true // Issue #770
+    },
+    notes: {
+        type: String,
+        trim: true,
+        maxlength: 500,
+        default: '',
+        sensitive: true // Issue #770
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    workspace: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        default: null
+    },
+    addedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    isPrivate: {
+        type: Boolean,
+        default: false
+    },
+    syncedToAccounting: {
+        type: Boolean,
+        default: false
+    },
+    version: {
+        type: Number,
+        default: 1
+    },
+    lastSyncedAt: {
+        type: Date,
+        default: Date.now
+    },
+    // Issue #738: Event Sourcing & Ledger Tracking
+    ledgerSequence: {
+        type: Number,
+        default: 0
+    },
+    ledgerStatus: {
+        type: String,
+        enum: ['synced', 'diverged', 'rebuilding'],
+        default: 'synced'
+    },
+    lastLedgerEventId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FinancialEvent'
+    },
+    appliedRules: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Rule'
+    }],
+    projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        default: null
+    },
+    billing: {
+        isBillable: { type: Boolean, default: false },
+        isBilled: { type: Boolean, default: false },
+        billedAt: Date,
+        invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProjectInvoice' },
+        markupOverride: Number
+    },
+    // New fields for Historical Currency Revaluation Engine Overhaul
+    forexMetadata: {
+        rateAtTransaction: { type: Number },
+        rateSource: { type: String, default: 'manual' },
+        lastRevaluedAt: { type: Date },
+        isHistoricallyAccurate: { type: Boolean, default: false },
+        historicalProvider: { type: String }
+    },
+    revaluationHistory: [{
+        revaluedAt: { type: Date, default: Date.now },
+        oldRate: Number,
+        newRate: Number,
+        oldConvertedAmount: Number,
+        newConvertedAmount: Number,
+        baseCurrency: String,
+        reason: String
+    }],
+    status: {
+        type: String,
+        enum: ['pending', 'processing', 'validated', 'archived', 'failed'],
+        default: 'pending'
+    },
+    processingLogs: [{
+        step: String,
+        status: String,
+        timestamp: { type: Date, default: Date.now },
+        message: String,
+        details: mongoose.Schema.Types.Mixed
+    }],
+    // New fields for Smart Location Intelligence
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [0, 0]
+        }
+    },
+    formattedAddress: {
+        type: String,
+        trim: true
+    },
+    locationSource: {
+        type: String,
+        enum: ['manual', 'geocoded', 'inferred', 'none'],
+        default: 'none'
+    },
+    place: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Place'
+    },
+    // New fields for Differential Data Synchronization
+    vectorClock: {
+        type: Map,
+        of: Number,
+        default: {}
+    },
+    syncMetadata: {
+        lastDeviceId: String,
+        lastModifiedByDevice: String,
+        checksum: String,
+        isDeleted: { type: Boolean, default: false },
+        deletedAt: Date,
+        syncStatus: { type: String, enum: ['synced', 'pending', 'conflict'], default: 'synced' },
+        conflictsCount: { type: Number, default: 0 }
+    },
+    // NEW: Features for Event Sourcing
+    lastEventId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FinancialEvent'
+    },
+    isEventSourced: {
+        type: Boolean,
+        default: true
+    },
+    // NEW: Features for Zero-Knowledge Vault
+    encryptedFields: {
+        type: [String],
+        default: [] // List of keys that are currently encrypted: ['description', 'notes']
+    },
+    // NEW: Features for Multi-Stage Validation
+    validationMetadata: {
+        purityScore: { type: Number, default: 100 },
+        validationId: String, // requestId from the pipeline
+        remediatedAt: Date
+    },
+    // NEW: Features for Semantic Indexing & Multi-Faceted Search
+    searchMetadata: {
+        tags: [{ type: String }],
+        merchantSentiment: { type: String, enum: ['positive', 'neutral', 'negative'], default: 'neutral' },
+        businessType: String,
+        isRecurringInferred: { type: Boolean, default: false },
+        indexedAt: Date
+    },
+    // NEW: Features for Differential Privacy Benchmarking
+    privacyMetadata: {
+        isBenchmarked: { type: Boolean, default: false },
+        lastBenchmarkedAt: Date,
+        privacyEpsilonConsumed: { type: Number, default: 0 }
+    },
+    // NEW: Features for Zero-Knowledge Compliance
+    zkAuditMetadata: {
+        zkProofId: { type: mongoose.Schema.Types.ObjectId, ref: 'ZKAttestation' },
+        complianceRoot: String,
+        isProven: { type: Boolean, default: false }
+    }
+}, {
+    timestamps: true
+});
+
+// Register Audit Plugin
+transactionSchema.plugin(auditPlugin, { modelName: 'Transaction' });
+
+// Middleware to increment version on save
+transactionSchema.pre('save', function (next) {
+    if (this.isModified()) {
+        this.version += 1;
+        this.lastSyncedAt = Date.now();
+    }
+    // Auto-set kind based on type if not set
+    if (this.type && !this.kind) {
+        this.kind = this.type;
+    }
+    next();
+});
+
+// Method to log processing steps
+transactionSchema.methods.logStep = async function (step, status, message, details = {}) {
+    this.processingLogs.push({ step, status, message, details });
+    if (status === 'failed') this.status = 'failed';
+    return this.save();
+};
+
+// Indexes for performance optimization
+transactionSchema.index({ description: 'text', merchant: 'text' }); // Text search
+transactionSchema.index({ user: 1, date: -1 });
+transactionSchema.index({ workspace: 1, date: -1 });
+transactionSchema.index({ user: 1, amount: 1 }); // Range queries optimization
+transactionSchema.index({ user: 1, category: 1, date: -1 });
+transactionSchema.index({ workspace: 1, category: 1, date: -1 });
+transactionSchema.index({ location: '2dsphere' });
+transactionSchema.index({ receiptId: 1 });
+transactionSchema.index({ source: 1, user: 1 });
+
+transactionSchema.virtual('history', {
+    ref: 'FinancialEvent',
+    localField: '_id',
+    foreignField: 'entityId'
+});
+
+// Issue #756: Automatic Search Indexing Hooks
+transactionSchema.post('save', async function (doc) {
+    try {
+        const indexingEngine = require('../services/indexingEngine');
+        await indexingEngine.indexEntity('TRANSACTION', doc, doc.user, doc.workspace);
+    } catch (err) {
+        console.error('Indexing failed on save:', err);
+    }
+});
+
+transactionSchema.post('remove', async function (doc) {
+    try {
+        const indexingEngine = require('../services/indexingEngine');
+        await indexingEngine.deindexEntity(doc._id);
+    } catch (err) {
+        console.error('Deindexing failed on remove:', err);
+    }
+});
+
+module.exports = mongoose.model('Transaction', transactionSchema);

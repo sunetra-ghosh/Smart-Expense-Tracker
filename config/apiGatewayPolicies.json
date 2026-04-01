@@ -1,0 +1,218 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-03-01T00:00:00.000Z",
+  "defaultPolicy": {
+    "policyId": "default",
+    "authRequired": true,
+    "allowedAuth": ["jwt", "oauth2"],
+    "requiredScopes": [],
+    "sensitivityTag": "medium",
+    "rateLimit": {
+      "windowMs": 60000,
+      "max": 120
+    },
+    "requestValidation": {
+      "allowedContentTypes": ["application/json", "application/x-www-form-urlencoded", "multipart/form-data"],
+      "requiredBodyFields": []
+    },
+    "threatDetection": {
+      "enabled": true,
+      "blockOnDetection": true,
+      "sensitivity": "medium"
+    },
+    "adaptiveRisk": {
+      "enabled": true,
+      "overheadBudgetMs": 50,
+      "sensitivityTag": "medium",
+      "thresholds": {
+        "tier1": 25,
+        "tier2": 50,
+        "tier3": 72,
+        "tier4": 90
+      },
+      "dynamicRateLimit": {
+        "enabled": true,
+        "multipliers": {
+          "tier0": 1,
+          "tier1": 1,
+          "tier2": 0.7,
+          "tier3": 0.35,
+          "tier4": 0.05
+        }
+      },
+      "stepUpAuth": {
+        "enabled": true,
+        "tiers": [2, 3, 4]
+      },
+      "geoVelocity": {
+        "enabled": true,
+        "suspiciousKmh": 500,
+        "impossibleKmh": 900
+      },
+      "behavior": {
+        "windowMs": 60000,
+        "burstRequestThreshold": 90,
+        "anomalyMemoryWeight": 0.35
+      },
+      "weights": {
+        "devicePosture": 0.2,
+        "ipReputation": 0.2,
+        "sessionConfidence": 0.2,
+        "requestSensitivity": 0.2,
+        "historicalBehavior": 0.2
+      },
+      "enforcement": {
+        "tier0": { "mode": "transparent" },
+        "tier1": { "mode": "soft-monitoring", "monitorOnly": true },
+        "tier2": { "mode": "step-up-auth", "requireStepUpAuth": true },
+        "tier3": { "mode": "throttled-restricted", "throttle": true, "restrictWriteMethods": true },
+        "tier4": { "mode": "blocked-soc-alert", "block": true, "socAlert": true }
+      }
+    }
+  },
+  "routePolicies": [
+    {
+      "policyId": "auth-login",
+      "pattern": "/api/auth/login",
+      "methods": ["POST"],
+      "authRequired": false,
+      "sensitivityTag": "high",
+      "rateLimit": {
+        "windowMs": 900000,
+        "max": 8
+      },
+      "requestValidation": {
+        "requiredBodyFields": ["email", "password"]
+      },
+      "adaptiveRisk": {
+        "stepUpAuth": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "policyId": "auth-register",
+      "pattern": "/api/auth/register",
+      "methods": ["POST"],
+      "authRequired": false,
+      "sensitivityTag": "high",
+      "rateLimit": {
+        "windowMs": 3600000,
+        "max": 5
+      },
+      "requestValidation": {
+        "requiredBodyFields": ["name", "email", "password"]
+      }
+    },
+    {
+      "policyId": "verify-2fa",
+      "pattern": "/api/auth/verify-2fa",
+      "methods": ["POST"],
+      "authRequired": false,
+      "sensitivityTag": "high",
+      "rateLimit": {
+        "windowMs": 600000,
+        "max": 10
+      }
+    },
+    {
+      "policyId": "webhooks",
+      "pattern": "/api/*/webhook*",
+      "methods": ["POST"],
+      "authRequired": false,
+      "allowedAuth": [],
+      "sensitivityTag": "medium",
+      "rateLimit": {
+        "windowMs": 60000,
+        "max": 240
+      },
+      "threatDetection": {
+        "enabled": true,
+        "blockOnDetection": false,
+        "sensitivity": "high"
+      }
+    },
+    {
+      "policyId": "payments-sensitive",
+      "pattern": "/api/payments/*",
+      "methods": ["POST", "PUT", "PATCH", "DELETE"],
+      "authRequired": true,
+      "requiredScopes": [],
+      "sensitivityTag": "critical",
+      "rateLimit": {
+        "windowMs": 60000,
+        "max": 40
+      },
+      "threatDetection": {
+        "enabled": true,
+        "blockOnDetection": true,
+        "sensitivity": "high"
+      },
+      "adaptiveRisk": {
+        "thresholds": {
+          "tier1": 20,
+          "tier2": 40,
+          "tier3": 60,
+          "tier4": 82
+        },
+        "dynamicRateLimit": {
+          "enabled": true,
+          "multipliers": {
+            "tier2": 0.55,
+            "tier3": 0.2,
+            "tier4": 0.02
+          }
+        }
+      }
+    },
+    {
+      "policyId": "gateway-admin",
+      "pattern": "/api/gateway/policies*",
+      "methods": ["GET", "PUT"],
+      "authRequired": true,
+      "requiredScopes": [],
+      "sensitivityTag": "high",
+      "rateLimit": {
+        "windowMs": 60000,
+        "max": 30
+      },
+      "threatDetection": {
+        "enabled": true,
+        "blockOnDetection": true,
+        "sensitivity": "high"
+      }
+    },
+    {
+      "policyId": "gateway-risk-health",
+      "pattern": "/api/gateway/risk-health",
+      "methods": ["GET"],
+      "authRequired": true,
+      "requiredScopes": [],
+      "sensitivityTag": "high",
+      "rateLimit": {
+        "windowMs": 60000,
+        "max": 30
+      }
+    },
+    {
+      "policyId": "gateway-risk-decisions",
+      "pattern": "/api/gateway/decisions",
+      "methods": ["GET"],
+      "authRequired": true,
+      "requiredScopes": [],
+      "sensitivityTag": "high",
+      "rateLimit": {
+        "windowMs": 60000,
+        "max": 20
+      },
+      "adaptiveRisk": {
+        "thresholds": {
+          "tier1": 20,
+          "tier2": 40,
+          "tier3": 58,
+          "tier4": 80
+        }
+      }
+    }
+  ]
+}

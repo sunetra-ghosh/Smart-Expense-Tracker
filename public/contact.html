@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Us | ExpenseFlow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- SAME CSS FILE -->
+    <link rel="stylesheet" href="expensetracker.css">
+    <link rel="stylesheet" href="contact.css">
+
+</head>
+
+<body>
+
+    <div class="cursor-trail-container" id="cursor-trail"></div>
+    <!-- HEADER -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-wallet"></i>
+                    <span><a href="index.html" class="nav-link">ExpenseFlow</a></span>
+                </div>
+
+                <div class="nav-menu">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="index.html#analytics" class="nav-link">Analytics</a>
+                    <a href="finance-tips.html" class="nav-link">Finance Tips</a>
+                    <a href="AboutUs.html" class="nav-link">About Us</a>
+                    <a href="contact.html" class="nav-link active">Contact</a>
+                </div>
+                <!-- Dark / Light Toggle -->
+<div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+</div>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- HERO -->
+        <section class="hero-section">
+            <h1 class="hero-title">Get in Touch</h1>
+            <p class="hero-subtitle">
+                Have questions or feedback? We'd love to hear from you.
+            </p>
+        </section>
+
+        <div class="contact-container">
+            <div class="contact-grid">
+                <!-- Info Column -->
+                <div class="contact-info">
+                    <div class="info-card">
+                        <i class="fas fa-envelope"></i>
+                        <h4>Email Us</h4>
+                        <p>support@expenseflow.com</p>
+                        <p>We aim to respond within 24 hours.</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-headset"></i>
+                        <h4>Support Center</h4>
+                        <p>Check our <a href="Help-Center.html" style="color: #64ffda;">Help Center</a> for quick
+                            answers.</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h4>Location</h4>
+                        <p>Remote First Team<br>Worldwide</p>
+                    </div>
+                </div>
+
+                <!-- Form Column -->
+                <div class="contact-form-card">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name *</label>
+                            <input type="text" id="name" name="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" placeholder="How can we help?">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="5" placeholder="Enter your message here..."
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send Message</span>
+                        </button>
+                        <div id="statusMsg" class="status-msg"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <i class="fas fa-wallet"></i>
+                    <span>ExpenseFlow</span>
+                </div>
+                <p>Smart money management made simple.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="finance-tips.html">Finance Tips</a></li>
+                    <li><a href="terms_service.html">Terms of Service</a></li>
+                    <li><a href="AboutUs.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p id="copyright" style="text-align:center;"></p>
+            <script>
+                document.getElementById("copyright").innerHTML =
+                `&copy; ${new Date().getFullYear()} Expense Flow . All rights reserved.`;
+            </script>
+        </div>
+    </footer>
+
+
+    <script src="protect.js"></script>
+    <script src="contact.js"></script>
+</body>
+
+</html>

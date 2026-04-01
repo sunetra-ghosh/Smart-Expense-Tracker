@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Community | ExpenseFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="community.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+  <div class="cursor-trail-container" id="cursor-trail"></div>
+
+
+
+  <!-- NAVBAR -->
+  <header class="header">
+    <nav class="nav-container">
+      <div class="nav-logo">
+        <i class="fas fa-wallet"></i>
+        <a href="index.html" class="nav-link">
+        ExpenseFlow
+        </a>
+      </div>
+
+      <div class="nav-menu">
+        <a href="index.html" class="nav-link">Dashboard</a>
+        <a href="Community.html" class="nav-link active">Community</a>
+        <a href="ai-advisor.html" class="nav-link " title="Chat with AI Advisor">AI Assistant</a>
+        <span class="theme-toggle" onclick="toggleTheme()">🌙</span>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main-content">
+
+    <section class="hero-section">
+      <h1 class="hero-title">Community</h1>
+      <p class="hero-subtitle">Share tips, ask questions, help others</p>
+    </section>
+
+    <div class="container">
+
+      <section class="form-section">
+        <h3><i class="fa-solid fa-pen"></i> Create Post</h3>
+        <div class="transaction-form">
+          <input id="title" placeholder="Post title">
+          <textarea id="content" rows="4" placeholder="Write your post..."></textarea>
+          <button class="btn-submit" onclick="addPost()">Post</button>
+        </div>
+      </section>
+
+      <section class="history-section">
+        <h3><i class="fa-solid fa-comments"></i> Community Posts</h3>
+        <ul id="posts" class="list"></ul>
+      </section>
+
+      <!-- Floating AI Advisor Button -->
+      <a href="ai-advisor.html" class="ai-advisor-btn" title="Chat with AI Advisor">
+        <i class="fas fa-sparkles"></i>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-section">
+        <div class="footer-logo">
+          <i class="fas fa-wallet"></i>
+          <span>ExpenseFlow</span>
+        </div>
+        <p>Smart money management made simple.</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <ul class="footer-links">
+          <li><a href="finance-tips.html">Finance Tips</a></li>
+          <li><a href="Help-Center.html">Help Center</a></li>
+          <li><a href="Community.html">Community</a></li>
+          <li><a href="PrivacyPolicy.html">Privacy Policy</a></li>
+          <li><a href="terms_service.html">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-container">
+        <p>&copy; 2026 ExpenseFlow. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SWEETALERT -->
+  <div id="swal">
+    <div class="swal-box">
+      <h3 id="swal-msg"></h3>
+      <button class="btn-submit" onclick="closeSwal()">OK</button>
+    </div>
+  </div>
+  <!-- Scroll To Top Button -->
+<button id="scrollTopBtn" title="Go to top">
+    <i class="fas fa-arrow-up"></i>
+</button>
+  <script src="protect.js"></script>
+  <script src="community.js"></script>
+
+</body>
+
+</html>
